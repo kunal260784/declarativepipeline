@@ -31,16 +31,16 @@ def getData(fileName: str, fileFormat:str, sourcePath : str, sourceName:str):
                     .withColumn('loaddt', current_timestamp())
                 )
 
+if __name__ == "__main__":
+    print("This is a module to read the data from the source.")
 
-
-sconfig = getSourceConfig()
-
-for table in getSourceTableConfig(sconfig['id']):
-    print(table.tablename)
-    @dp.table(
-        name = f'{table.tablename}'  ,
-        comment = f"{table.tablename} Table Created for Source {sourceName}/{table.tablename}"     
-    )
-    def create_table(table):
-        return getData( table.filename, table.format, table.filepath,sourceName)
+    sconfig = getSourceConfig()
+    for table in getSourceTableConfig(sconfig['id']).collect():
+        print(table.tablename)
+        @dp.table(
+            name = f'{table.tablename}'  ,
+            comment = f"{table.tablename} Table Created for Source {sourceName}/{table.tablename}"     
+        )
+        def create_table(t=table):
+            return getData( t.filename, t.format, t.filepath,sourceName)
 
